@@ -1,7 +1,9 @@
-﻿using MtaServer.Packets.Enums;
+﻿using MtaServer.Packets.Builder;
+using MtaServer.Packets.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
+
 namespace MtaServer.Packets.Definitions.Join
 {
     public class JoinedGamePacket : Packet
@@ -13,7 +15,7 @@ namespace MtaServer.Packets.Definitions.Join
         public int PlayerCount { get; }
         public uint RootId { get; }
         public HttpDownloadType HttpDownloadType { get; }
-        public int HttpPort { get; }
+        public ushort HttpPort { get; }
         public string HttpUrl { get; }
         public int HttpConnectionsPerClient { get; }
         public bool IsFakeLagCommandEnabled { get; }
@@ -28,7 +30,7 @@ namespace MtaServer.Packets.Definitions.Join
             int playerCount,
             uint rootId,
             HttpDownloadType httpDownloadType,
-            int httpPort,
+            ushort httpPort,
             string httpUrl,
             int httpConnectionsPerClient,
             int enableClientChecks,

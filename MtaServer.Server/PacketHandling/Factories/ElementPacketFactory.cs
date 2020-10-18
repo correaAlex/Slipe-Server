@@ -15,5 +15,14 @@ namespace MtaServer.Server.PacketHandling.Factories
         {
             return new SetElementPositionRpcPacket(element.Id, element.GetAndIncrementTimeContext(), position, isWarp);
         }
+
+        public static SetElementHealthRpcPacket CreateSetHealthPacket(Element element, float health)
+        {
+            return new SetElementHealthRpcPacket(element.Id, element.GetAndIncrementTimeContext(), health);
+        }
+        public static SetElementAlphaRpcPacket CreateSetAlphaPacket(Element element, byte alpha)
+        {
+            return new SetElementAlphaRpcPacket(element.Id, element.GetAndIncrementTimeContext(), alpha);
+        }
     }
 }

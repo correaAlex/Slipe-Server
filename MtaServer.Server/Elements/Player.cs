@@ -1,8 +1,6 @@
 ﻿using System;
-using MtaServer.Packets;
-using MTAServerWrapper.Server;
-using System.Net;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace MtaServer.Server.Elements
 {
@@ -12,11 +10,7 @@ namespace MtaServer.Server.Elements
 
         public Client Client { get; }
 
-        public string? Name { get; set; }
-        public float Health { get; set; }
-        public float Armor { get; set; }
         public PlayerWeapon CurrentWeapon { get; set; }
-
         public Element? ContactElement { get; set; }
 
         public Vector3 AimOrigin { get; set; }
@@ -28,7 +22,6 @@ namespace MtaServer.Server.Elements
 
         public bool IsInWater { get; set; }
         public bool IsOnGround { get; set; }
-        public bool HasJetpack { get; set; }
         public bool IsDucked { get; set; }
         public bool WearsGoggles { get; set; }
         public bool HasContact { get; set; }
@@ -38,15 +31,17 @@ namespace MtaServer.Server.Elements
         public bool IsSyncingVelocity { get; set; }
         public bool IsStealthAiming { get; set; }
 
-        internal Player(Client client): base()
+        internal Player(Client client) : base(0, Vector3.Zero)
         {
             this.Client = client;
         }
 
-        public void HandleCommand(string command, string[] arguments) => OnCommand?.Invoke(command, arguments);
-        public void HandleJoin() => OnJoin?.Invoke(this);
+        public new Player AssociateWith(MtaServer server)
+        {
+            return server.AssociateElement(this);
+        }
 
-        public static event Action<Player>? OnJoin;
+        public void HandleCommand(string command, string[] arguments) => OnCommand?.Invoke(command, arguments);
         public event Action<string, string[]>? OnCommand;
     }
 }

@@ -33,12 +33,32 @@ namespace MtaServer.ConfigurationProviders.Configurations
                         break;
                     case "maxPlayers":
                         if (ushort.TryParse(node.InnerText, out result))
-                            configuration.MaxPlayers = result;
+                            configuration.MaxPlayerCount = result;
 
                         break;
                     case "password":
                         configuration.Password = node.InnerText;
                         break;
+
+                    case "httpPort":
+                        configuration.HttpPort = ushort.Parse(node.InnerText);
+                        break;
+
+                    case "httpUrl":
+                        configuration.HttpUrl = node.InnerText;
+                        break;
+
+                    case "httpHost":
+                        configuration.HttpHost = node.InnerText;
+                        break;
+
+                    case "httpConnectionsPerClient":
+                        configuration.HttpConnectionsPerClient = int.Parse(node.InnerText);
+                        break;
+
+                    case "ResourceDirectory":
+                        configuration.ResourceDirectory = node.InnerText;
+                        break;                        
                 }
             }
         }

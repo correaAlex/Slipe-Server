@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
+using Microsoft.Extensions.Logging;
 using MtaServer.Packets.Definitions.Commands;
 using MtaServer.Server.Elements;
 
@@ -9,19 +8,18 @@ namespace MtaServer.Server.Behaviour
 {
     public class DefaultChatBehaviour
     {
-        public DefaultChatBehaviour(MtaServer server)
+        public DefaultChatBehaviour(MtaServer server, ILogger? logger)
         {
-            Player.OnJoin += (player) =>
+            server.PlayerJoined += (player) =>
             {
                 player.OnCommand += (command, arguments) =>
                 {
                     if(command == "say")
                     {
-                        var packet = new ChatEchoPacket(server.Root.Id, player.Name + ": " + string.Join(' ', arguments), Color.White);
-                        foreach (var _player in server.ElementRepository.GetByType<Player>(ElementType.Player))
-                        {
-                            _player.Client.SendPacket(packet);
-                        }
+                        string message = $"{player.Name}: {string.Join(' ', arguments)}";
+                        var packet = new ChatEchoPacket(player.Id, message, Color.White);
+                        server.BroadcastPacket(packet);
+                        logger?.LogInformation(message);
                     }
                 };
             };

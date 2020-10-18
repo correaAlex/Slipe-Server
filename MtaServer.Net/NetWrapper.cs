@@ -1,4 +1,5 @@
-﻿using MtaServer.Packets;
+﻿using MtaServer.Net;
+using MtaServer.Packets;
 using MtaServer.Packets.Enums;
 using System;
 using System.Diagnostics;
@@ -6,7 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace MTAServerWrapper.Server
+namespace MtaServer.Net
 {
     public class NetWrapper
     {
@@ -47,7 +48,7 @@ namespace MTAServerWrapper.Server
 
             if (result != 0)
             {
-                throw new Exception($"Unable to start net wrapper. Error code {result}");
+                throw new Exception($"Unable to start net wrapper. Error code: {result} ({((NetWrapperErrorCode)result)})");
             }
 
             Debug.WriteLine($"Net wrapper initialized: {result}");
@@ -91,6 +92,11 @@ namespace MTAServerWrapper.Server
         public void SendPacket(uint binaryAddress, Packet packet)
         {
             SendPacket(binaryAddress, (byte)packet.PacketId, packet.Write());
+        }
+
+        public void SendPacket(uint binaryAddress, PacketId packetId, byte[] data)
+        {
+            SendPacket(binaryAddress, (byte)packetId, data);
         }
 
         public void SetVersion(uint binaryAddress, ushort version)

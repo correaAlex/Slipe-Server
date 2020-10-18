@@ -1,6 +1,9 @@
 ﻿using MtaServer.Packets.Definitions.Join;
 using MtaServer.Packets.Enums;
 using MtaServer.Server.Elements;
+using MtaServer.Server.Enums;
+using MtaServer.Server.PacketHandling.Factories;
+using MtaServer.Server.Repositories;
 using MTAServerWrapper.Packets.Outgoing.Connection;
 using System;
 using System.Runtime.InteropServices;
@@ -10,7 +13,15 @@ namespace MtaServer.Server.PacketHandling.QueueHandlers
 {
     public class ConnectionQueueHandler : WorkerBasedQueueHandler
     {
-        public ConnectionQueueHandler(MtaServer server, int sleepInterval, int workerCount): base(server, sleepInterval, workerCount) { }
+        private readonly MtaServer server;
+        private readonly IElementRepository elementRepository;
+
+        public ConnectionQueueHandler(MtaServer server, IElementRepository elementRepository, int sleepInterval, int workerCount)
+            : base(sleepInterval, workerCount)
+        {
+            this.server = server;
+            this.elementRepository = elementRepository;
+        }
 
         protected override void HandlePacket(PacketQueueEntry queueEntry)
         {
@@ -25,8 +36,11 @@ namespace MtaServer.Server.PacketHandling.QueueHandlers
                     HandleClientJoinData(queueEntry.Client, joinDataPacket);
                     break;
                 case PacketId.PACKET_ID_PLAYER_QUIT:
+                    HandleClientQuit(queueEntry.Client, QuitReason.Quit);
+                    break;
                 case PacketId.PACKET_ID_PLAYER_TIMEOUT:
-                    HandleClientQuit(queueEntry.Client);
+                case PacketId.PACKET_ID_PLAYER_NO_SOCKET:
+                    HandleClientQuit(queueEntry.Client, QuitReason.Timeout);
                     break;
             }
         }
@@ -51,9 +65,12 @@ namespace MtaServer.Server.PacketHandling.QueueHandlers
             client.FetchSerial();
         }
 
-        private void HandleClientQuit(Client client)
+        private void HandleClientQuit(Client client, QuitReason reason)
         {
-            server.ElementRepository.Remove(client.Player);
+            var packet = PlayerPacketFactory.CreateQuitPacket(client.Player, reason);
+            this.server.BroadcastPacket(packet);
+
+            client.Player.Destroy();
         }
     }
 }
